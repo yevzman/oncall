@@ -5,7 +5,7 @@ server:
   host: 0.0.0.0
   port: 8080
 oncall_host: http://localhost:8080
-metrics: dummy
+metrics: prometheus
 db:
   conn:
     kwargs:
@@ -121,6 +121,13 @@ messengers:
   - type: dummy
     application: oncall
     iris_api_key: magic
+
+############################
+### Oncall prometheus
+############################
+prometheus:
+  oncall-notifier:
+    server_port: 8585
 
 ############################
 ### Oncall frontend settings
