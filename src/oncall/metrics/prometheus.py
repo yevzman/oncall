@@ -36,7 +36,7 @@ class prometheus(object):
             return
         for metric, value in metrics.items():
             if metric not in self.gauges:
-                self.gauges[metric] = Gauge(self.appname + '_' + metric, '')
+                self.gauges[metric] = Gauge(metric, '')
             logger.info('Setting metrics gauge %s to %s', metric, value)
-            self.gauges[metric].set_to_current_time()
-            self.gauges[metric].set(value)
+            self.gauges[metric].labels(app=self.appname).set_to_current_time()
+            self.gauges[metric].labels(app=self.appname).set(value)
