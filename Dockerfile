@@ -6,6 +6,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteract
         mysql-client uwsgi uwsgi-plugin-python3 nginx \
     && rm -rf /var/cache/apt/archives/*
 
+# RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --fix-missing curl lsof 
+
 RUN useradd -m -s /bin/bash oncall
 
 COPY src /home/oncall/source/src
