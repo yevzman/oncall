@@ -73,6 +73,10 @@ INSERT INTO `setting_role` VALUES (1,1),(2,1),(3,1),(4,1),(7,1),(8,1),(9,1),(1,2
 /*!40000 ALTER TABLE `setting_role` ENABLE KEYS */;
 UNLOCK TABLES;
 
+LOCK TABLES `application` WRITE;
+INSERT INTO `application` VALUES (1,'test_app','test_key');
+UNLOCK TABLES;
+
 
 LOCK TABLES `team_admin` WRITE;
 /*!40000 ALTER TABLE `team_admin` DISABLE KEYS */;
