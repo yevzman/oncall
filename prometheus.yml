@@ -8,4 +8,4 @@ scrape_configs:
 
   - job_name: 'node-exporter'
     static_configs:
-      - targets: ['oncall_node-exporter:9100']
+      - targets: ['oncall_node-exporter_1:9100']
