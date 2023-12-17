@@ -5,10 +5,22 @@ services:
     image: prom/prometheus
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./alermanager/alert.rules.yml:/etc/prometheus/alert.rules.yml
     ports:
       - "9090:9090"
     networks:
       - iris
+  
+  alertmanager:
+    image: prom/alertmanager:latest
+    ports:
+      - 9093:9093
+    volumes:
+      - ./alertmanager:/etc/alertmanager
+    command:
+      - --config.file=/etc/alertmanager/alermanager.yml
+      - --storage.path=/etc/alertmanager/
+
   oncall-web:
     build: .
     hostname: oncall
@@ -49,7 +61,6 @@ services:
       --collector.filesystem
       --collector.meminfo
       --collector.netdev
-      --collector.processes
       --collector.textfile
       --collector.textfile.directory=./metrics/
     volumes:

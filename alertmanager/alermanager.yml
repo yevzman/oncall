@@ -1,0 +1,24 @@
+# The directory from which notification templates are read.
+# templates:
+#   - '/etc/alertmanager/template/*.tmpl'
+global:
+  resolve_timeout: 10m
+
+route:
+  receiver: alert-telegram
+  group_interval: 10s
+  repeat_interval: 30m
+  routes:
+  - match:
+      alertname: test-telegram
+    receiver: alert-telegram
+
+receivers:
+  - name: 'alert-telegram'
+    telegram_configs:
+      - bot_token: 6619765929:AAEo_D1WTeA7_-18yZTX_XAYlF2Lw-hRzeU
+        api_url: https://api.telegram.org
+        chat_id: -1002120907583
+        parse_mode: ''
+
+  
