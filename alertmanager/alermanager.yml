@@ -1,13 +1,10 @@
 # The directory from which notification templates are read.
 # templates:
 #   - '/etc/alertmanager/template/*.tmpl'
-global:
-  resolve_timeout: 10m
-
 route:
   receiver: alert-telegram
   group_interval: 10s
-  repeat_interval: 30m
+  repeat_interval: 30s
   routes:
   - match:
       alertname: test-telegram
