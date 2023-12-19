@@ -21,20 +21,40 @@ services:
       - --config.file=/etc/alertmanager/alermanager.yml
       - --storage.path=/etc/alertmanager/
 
-  oncall-web:
+  oncall-base: &oncall_base
     build: .
-    hostname: oncall
-    ports:
-      - "8080:8080"
-      - "8585:8585"
+    volumes:
+      - ./configs/config.docker.yaml:/home/oncall/config/config.yaml
+      - ./db/db_initialized:/home/oncall/db_initialized
+    networks:
+      - iris
     environment:
       - DOCKER_DB_BOOTSTRAP=1
       - IRIS_API_HOST=iris
+    
+  oncall-web:
+    <<: *oncall_base
+    hostname: oncall
+    ports:
+      - "8080-8082:8080"
+      - "8585-8587:8585"
+    environment:
+      - DOCKER_DB_BOOTSTRAP=0
+      - IRIS_API_HOST=iris
+    deploy:
+      replicas: 3
+
+  nginx:
+    image: nginx:latest
     volumes:
-      - ./configs/config.docker.yaml:/home/oncall/config/config.yaml
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
     networks:
       - iris
-  
+    depends_on:
+      - oncall-web
+
   oncall-mysql:
     hostname: oncall-mysql
     image: mysql:latest
@@ -78,6 +98,14 @@ services:
       - ./configs/blackbox.yml:/etc/blackbox/blackbox.yml
     networks:
       - iris
+  
+  nginx-node-exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    ports:
+      - 9113:9113
+    command:
+      -nginx.scrape-uri=http://nginx_1:80/metrics
+      -web.telemetry-path=/metrics
 
 
 networks:

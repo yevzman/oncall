@@ -20,6 +20,10 @@ scrape_configs:
     static_configs:
       - targets: ['oncall_node-exporter_1:9100']
   
+  - job_name: 'nginx-exporter'
+    static_configs:
+      - targets: ['nginx-node-exporter_1:9113']
+    
   - job_name: blackbox-http
     metrics_path: /probe
     params:

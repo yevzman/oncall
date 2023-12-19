@@ -13,6 +13,14 @@ dbpath = '/home/oncall/db'
 initializedfile = '/home/oncall/db_initialized'
 
 
+def already_init_db():
+    with open(initializedfile, 'r') as file:
+        if file.read() == '0':
+            print('DB still not initialized')
+            return False
+        print('DB already initialized')
+        return True
+
 def load_sqldump(config, sqlfile, one_db=True):
     print('Importing %s...' % sqlfile)
     with open(sqlfile) as h:
@@ -70,11 +78,20 @@ def initialize_mysql_schema(config):
     if not re:
         sys.stderr.write('Failed to load dummy data.')
 
-    with open(initializedfile, 'w'):
+    with open(initializedfile, 'w') as file:
+        file.write('1')
         print('Wrote %s so we don\'t bootstrap db again' % initializedfile)
 
 
 def main():
+    should_init_db = False
+    if 'DOCKER_DB_BOOTSTRAP' in os.environ:
+        should_init_db = int(os.environ['DOCKER_DB_BOOTSTRAP'])
+    
+    if should_init_db:
+        if already_init_db():
+            exit(0)
+
     oncall_config = read_config(
         os.environ.get('ONCALL_CFG_PATH', '/home/oncall/config/config.yaml'))
     mysql_config = oncall_config['db']['conn']['kwargs']
@@ -83,9 +100,12 @@ def main():
     # if it can't immediately connect to MySQL, so we have to wait for it.
     wait_for_mysql(mysql_config)
 
-    if 'DOCKER_DB_BOOTSTRAP' in os.environ:
-        if not os.path.exists(initializedfile):
-            initialize_mysql_schema(mysql_config)
+    if should_init_db:
+        initialize_mysql_schema(mysql_config) 
+        exit(0)
+    else:
+        while not already_init_db():
+            time.sleep(2)
 
     os.execv('/usr/bin/uwsgi',
              ['/usr/bin/uwsgi', '--yaml', '/home/oncall/daemons/uwsgi.yaml:prod'])
